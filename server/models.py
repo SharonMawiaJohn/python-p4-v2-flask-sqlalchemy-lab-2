@@ -10,8 +10,12 @@ metadata = MetaData(naming_convention={
 db = SQLAlchemy(metadata=metadata)
 
 # Customer Model
-class Customer(db.Model):
+class Customer(db.Model, SerializerMixin):
     __tablename__ = 'customers'
+    
+    # Define serialization rules
+    __serialize_only__ = ('id', 'name', 'reviews')
+    __exclude__ = ('reviews.customer',)  # Exclude the customer in reviews
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
@@ -26,8 +30,12 @@ class Customer(db.Model):
         return f'<Customer {self.id}, {self.name}>'
 
 # Item Model
-class Item(db.Model):
+class Item(db.Model, SerializerMixin):
     __tablename__ = 'items'
+    
+    # Define serialization rules
+    __serialize_only__ = ('id', 'name', 'price', 'reviews')
+    __exclude__ = ('reviews.item',)  # Exclude the item in reviews
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
@@ -43,8 +51,12 @@ class Item(db.Model):
         return f'<Item {self.id}, {self.name}, {self.price}>'
 
 # Review Model
-class Review(db.Model):
+class Review(db.Model, SerializerMixin):
     __tablename__ = 'reviews'
+    
+    # Define serialization rules
+    __serialize_only__ = ('id', 'comment', 'customer', 'item')
+    __exclude__ = ('customer.reviews', 'item.reviews')  # Exclude reviews in customer and item
 
     id = db.Column(db.Integer, primary_key=True)
     comment = db.Column(db.String)
